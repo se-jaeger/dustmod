@@ -5,7 +5,7 @@ DUSTMOD_COMMAND_TRACK_MIN_TIME_SECS=${DUSTMOD_COMMAND_TRACK_MIN_TIME_SECS:=20}
 # show a long description of the git status, e.g. 'modified' or only symbols
 DUSTMOD_GIT_STATUS_LONG_DESCRIPTION=${DUSTMOD_GIT_STATUS_LONG_DESCRIPTION:="true"}
 # show the 'username@hostname' always or only when on remote machines
-DUSTMOD_USER_HOST_ALWAYS="${DUSTMOD_USER_HOST_ALWAYS:=true}"
+DUSTMOD_USER_HOST_ALWAYS="${DUSTMOD_USER_HOST_ALWAYS:=false}"
 
 # requires git.zsh lib
 ZSH_THEME_GIT_PROMPT_PREFIX="(git:%F{green}"
@@ -51,9 +51,9 @@ function git_info {
 
 function prompt_prefix {
     if [ $UID -eq 0 ]; then 
-        echo "%{$fg[red]%}#❯ %{$reset_color%}";
+        echo "%{$fg[red]%}# %{$reset_color%}";
     else 
-        echo "%{$FG[108]%}$❯ %{$reset_color%}";
+        echo "%{$FG[108]%}$ %{$reset_color%}";
     fi
 }
 
@@ -101,7 +101,6 @@ function error_description {
 function last_command_status {
     local return_value=$?
     if [ $return_value -ne 0 ]; then
-        echo # add a newline
         echo -n "%{$fg[red]%}✘ FAILED with exit code $return_value"
         echo -n ": "; error_description "$return_value"; echo -n "%{$reset_color%}"
     fi
@@ -136,16 +135,16 @@ function cmd_exec_time {
     let local elapsed=$stop-$start
     if [ $elapsed -gt $DUSTMOD_COMMAND_TRACK_MIN_TIME_SECS ]; then
         time_pretty=$(print_human_time $elapsed)
-        echo # add a newline
+        echo # newline
         echo -n "%{$FG[240]%}"
-        echo -n "⌚ Command execution took ${time_pretty} %{$reset_color%}"
+        echo -n "Command execution took ${time_pretty} %{$reset_color%}"
     fi
 }
 
 # disables prompt mangling in virtual_env/bin/activate
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 ZSH_THEME_VIRTUAL_ENV_PROMPT_PREFIX="(venv:"
-ZSH_THEME_VIRTUAL_ENV_PROMPT_SUFFIX=")"
+ZSH_THEME_VIRTUAL_ENV_PROMPT_SUFFIX=") "
 
 function virtualenv_prompt_info {
     if [ -n "$VIRTUAL_ENV" ]; then
@@ -172,12 +171,12 @@ function columns_filler_space {
     # for an explanation of below length computation
     local zero='%([BSUbfksu]|([FK]|){*})'
     local STRING_LENGTH=${#${(S%%)STRING//$~zero/}}
-    local SPACES=""
-    ((LENGTH = ${COLUMNS} - $STRING_LENGTH - 1))
+    local SPACES="."
+    ((LENGTH = ${COLUMNS} - $STRING_LENGTH - 5))
 
     # TODO: handle negative lengths, i.e. if the strings are too long for the columns
     for i in {0..$LENGTH}; do
-      SPACES="$SPACES "
+      SPACES="$SPACES."
     done
 
     echo $SPACES
@@ -193,19 +192,14 @@ setopt prompt_subst
 PREV_COMMAND_INFO='$(last_command_status)$(cmd_exec_time)'
 # needs single quotes to be evaluated in the prompt each time with latest state values
 HEADLINE_LEFT='$(user_and_host)$(is_current_dir_writable)$(current_dir)$(git_info)'
-
-# Note that the following unicode ⌚⏰ symbols seem to confuse zsh about the length, 
-CLOCK='%{$fg[blue]%}%{$fg[blue]%}%* ⏲ %{$reset_color%}'
-
+CLOCK=' %{$fg_bold[red]%}[%{$reset_color%}%{$fg[blue]%}%*%{$fg_bold[red]%}]%{$reset_color%}%{$reset_color%}'
 COMMANDLINE='$(virtualenv_prompt_info)$(prompt_prefix)'
-
 SPACER='$(columns_filler_space $HEADLINE_LEFT$CLOCK)'
 
 PROMPT="$PREV_COMMAND_INFO
-$HEADLINE_LEFT$SPACER$CLOCK
-$COMMANDLINE"
 
-# nothing for now in the right prompt.
-# showing e.g. the CLOCK there puts it on the line of the commands
-#RPROMPT='$CLOCK'
-RPROMPT=''
+%{$fg_bold[red]%}┌>%{$reset_color%} $HEADLINE_LEFT$SPACER$CLOCK
+%{$fg_bold[red]%}└>%{$reset_color%} $COMMANDLINE"
+
+# right prompt
+RPROMPT='%{$fg_bold[red]%}¯\_(ツ)_/¯%{$reset_color%}'
