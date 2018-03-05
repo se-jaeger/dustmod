@@ -135,7 +135,6 @@ function cmd_exec_time {
     let local elapsed=$stop-$start
     if [ $elapsed -gt $DUSTMOD_COMMAND_TRACK_MIN_TIME_SECS ]; then
         time_pretty=$(print_human_time $elapsed)
-        echo # newline
         echo -n "%{$FG[240]%}"
         echo -n "Command execution took ${time_pretty} %{$reset_color%}"
     fi
