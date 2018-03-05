@@ -53,7 +53,7 @@ function prompt_prefix {
     if [ $UID -eq 0 ]; then 
         echo "%{$fg[red]%}# %{$reset_color%}";
     else 
-        echo "%{$FG[108]%}$ %{$reset_color%}";
+        echo "%{$fg[yellow]%}$ %{$reset_color%}";
     fi
 }
 
@@ -61,7 +61,7 @@ function username {
     if [ $UID -eq 0 ]; then 
         echo "%{$fg[red]%}%n%{$reset_color%}"; 
     else 
-        echo "%{$FG[108]%}%n%{$reset_color%}"; 
+        echo "%{$fg[yellow]%}%n%{$reset_color%}"; 
     fi
 }
 
@@ -73,7 +73,7 @@ function ssh_connection {
 
 function user_and_host {
     if [[ "$DUSTMOD_USER_HOST_ALWAYS" == "true" || -n $SSH_CONNECTION ]]; then
-        echo "$(username)@%{$fg[white]%}%m$(ssh_connection)%{$reset_color%} "
+        echo "$(username)@%{$fg_bold[yellow]%}%m$(ssh_connection)%{$reset_color%} "
     fi
 }
 
@@ -135,7 +135,7 @@ function cmd_exec_time {
     let local elapsed=$stop-$start
     if [ $elapsed -gt $DUSTMOD_COMMAND_TRACK_MIN_TIME_SECS ]; then
         time_pretty=$(print_human_time $elapsed)
-        echo -n "%{$FG[240]%}"
+        echo -n "%{$fg_bold[black]%}"
         echo -n "Command execution took ${time_pretty} %{$reset_color%}"
     fi
 }
@@ -171,7 +171,7 @@ function columns_filler_space {
     local zero='%([BSUbfksu]|([FK]|){*})'
     local STRING_LENGTH=${#${(S%%)STRING//$~zero/}}
     local SPACES="."
-    ((LENGTH = ${COLUMNS} - $STRING_LENGTH - 5))
+    ((LENGTH = ${COLUMNS} - $STRING_LENGTH - 6))
 
     # TODO: handle negative lengths, i.e. if the strings are too long for the columns
     for i in {0..$LENGTH}; do
@@ -191,14 +191,14 @@ setopt prompt_subst
 PREV_COMMAND_INFO='$(last_command_status)$(cmd_exec_time)'
 # needs single quotes to be evaluated in the prompt each time with latest state values
 HEADLINE_LEFT='$(user_and_host)$(is_current_dir_writable)$(current_dir)$(git_info)'
-CLOCK=' %{$fg_bold[red]%}[%{$reset_color%}%{$fg[blue]%}%*%{$fg_bold[red]%}]%{$reset_color%}%{$reset_color%}'
+CLOCK=' %{$fg_bold[magenta]%}[%{$reset_color%}%{$fg[blue]%}%*%{$fg_bold[magenta]%}] <┐%{$reset_color%}%{$reset_color%}'
 COMMANDLINE='$(virtualenv_prompt_info)$(prompt_prefix)'
 SPACER='$(columns_filler_space $HEADLINE_LEFT$CLOCK)'
 
 PROMPT="$PREV_COMMAND_INFO
 
-%{$fg_bold[red]%}┌>%{$reset_color%} $HEADLINE_LEFT$SPACER$CLOCK
-%{$fg_bold[red]%}└>%{$reset_color%} $COMMANDLINE"
+%{$fg_bold[magenta]%}┌>%{$reset_color%} $HEADLINE_LEFT$SPACER$CLOCK
+%{$fg_bold[magenta]%}└>%{$reset_color%} $COMMANDLINE"
 
 # right prompt
-RPROMPT='%{$fg_bold[red]%}¯\_(ツ)_/¯%{$reset_color%}'
+RPROMPT='%{$fg_bold[magenta]%}¯\_(ツ)_/¯ <┘%{$reset_color%}'
