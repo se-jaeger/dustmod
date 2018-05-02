@@ -17,7 +17,9 @@ Features are:
 
 
 ## Screenshots
-TODO
+![Showing features](https://raw.githubusercontent.com/se-jaeger/hunter-zsh-scheme/master/screenshots/hunter_screenshot.png)
+
+With [this](https://github.com/se-jaeger/my-zsh#2-setup-iterm2) configuration the screenshots were taken.
 
 
 ## Requirements
