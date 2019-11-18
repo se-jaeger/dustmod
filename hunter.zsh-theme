@@ -6,6 +6,8 @@ DUSTMOD_COMMAND_TRACK_MIN_TIME_SECS=${DUSTMOD_COMMAND_TRACK_MIN_TIME_SECS:=20}
 DUSTMOD_GIT_STATUS_LONG_DESCRIPTION=${DUSTMOD_GIT_STATUS_LONG_DESCRIPTION:="true"}
 # show the 'username@hostname' always or only when on remote machines
 DUSTMOD_USER_HOST_ALWAYS="${DUSTMOD_USER_HOST_ALWAYS:=false}"
+# show python env information in prompt or not
+HUNTER_PYTHONN_ENV_PROMPT_ENABLED=${HUNTER_PYTHONN_ENV_PROMPT_ENABLED:="true"}
 
 # requires git.zsh lib
 ZSH_THEME_GIT_PROMPT_PREFIX="(git:%F{green}"
@@ -140,21 +142,50 @@ function cmd_exec_time {
     fi
 }
 
-# disables prompt mangling in virtual_env/bin/activate
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 ZSH_THEME_VIRTUAL_ENV_PROMPT_PREFIX="(venv:"
 ZSH_THEME_VIRTUAL_ENV_PROMPT_SUFFIX=") "
 
 function virtualenv_prompt_info {
-    if [ -n "$VIRTUAL_ENV" ]; then
-        if [ -f "$VIRTUAL_ENV/__name__" ]; then
-            local name=`cat $VIRTUAL_ENV/__name__`
-        elif [ `basename $VIRTUAL_ENV` = "__" ]; then
-            local name=$(basename $(dirname $VIRTUAL_ENV))
-        else
-            local name=$(basename $VIRTUAL_ENV)
+
+    if [ -f "$VIRTUAL_ENV/__name__" ]; then
+        local name=`cat $VIRTUAL_ENV/__name__`
+    elif [ `basename $VIRTUAL_ENV` = "__" ]; then
+        local name=$(basename $(dirname $VIRTUAL_ENV))
+    else
+        local name=$(basename $VIRTUAL_ENV)
+    fi
+    echo "$ZSH_THEME_VIRTUAL_ENV_PROMPT_PREFIX%{$fg[green]%}$name%{$reset_color%}$ZSH_THEME_VIRTUAL_ENV_PROMPT_SUFFIX"
+}
+
+
+HUNTER_THEME_CONDA_PROMPT_PREFIX="(conda:"
+HUNTER_THEME_CONDA_PROMPT_SUFFIX=") "
+
+function conda_prompt_info {
+
+
+
+    local name="$CONDA_DEFAULT_ENV"
+    echo "$HUNTER_THEME_CONDA_PROMPT_PREFIX%{$fg[green]%}$name%{$reset_color%}$HUNTER_THEME_CONDA_PROMPT_SUFFIX"
+}
+
+function python_env_prompt_info {
+
+    if [[ "$HUNTER_PYTHONN_ENV_PROMPT_ENABLED" == "true" ]]; then
+
+        if [ -n "$VIRTUAL_ENV" ] && [ -n "$CONDA_DEFAULT_ENV" ]; then
+            echo "%{$fg[red]%}(venv and conda activated!)%{$reset_color%}"
+            exit
         fi
-        echo "$ZSH_THEME_VIRTUAL_ENV_PROMPT_PREFIX%{$fg[green]%}$name%{$reset_color%}$ZSH_THEME_VIRTUAL_ENV_PROMPT_SUFFIX"
+
+        if [ -n "$VIRTUAL_ENV" ]; then
+            virtualenv_prompt_info
+        fi
+
+        if [ -n "$CONDA_DEFAULT_ENV" ]; then
+            conda_prompt_info
+        fi
     fi
 }
 
@@ -192,7 +223,7 @@ PREV_COMMAND_INFO='$(last_command_status)$(cmd_exec_time)'
 # needs single quotes to be evaluated in the prompt each time with latest state values
 HEADLINE_LEFT='$(user_and_host)$(is_current_dir_writable)$(current_dir)$(git_info)'
 CLOCK=' %{$fg_bold[magenta]%}[%{$reset_color%}%{$fg[blue]%}%*%{$fg_bold[magenta]%}] <┐%{$reset_color%}%{$reset_color%}'
-COMMANDLINE='$(virtualenv_prompt_info)$(prompt_prefix)'
+COMMANDLINE='$(python_env_prompt_info)$(prompt_prefix)'
 SPACER='$(columns_filler_space $HEADLINE_LEFT$CLOCK)'
 
 PROMPT="$PREV_COMMAND_INFO

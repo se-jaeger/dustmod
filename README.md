@@ -44,6 +44,8 @@ The appearance can be modified by setting environment variables in your `.zhrc`:
 - `HUNTER_COMMAND_TRACK_MIN_TIME_SECS=20` - after how many seconds consider a "long running command" and display its runtime after it finished
 - `HUNTER_GIT_STATUS_LONG_DESCRIPTION="true"` - show the git status verbose, e.g. `✶modified` or only using the symbols `✶`
 - `HUNTER_USER_HOST_ALWAYS="true"` - show the `username@hostname` part always or hide it when on the local machine
+- `HUNTER_PYTHONN_ENV_PROMPT_ENABLED` - set to `false` to deactivate environment printing
+- Use `conda config --set changeps1 False` to prevent conda from changing PS1.
 
 
 For further changes, modify the code!
