@@ -7,7 +7,7 @@ DUSTMOD_GIT_STATUS_LONG_DESCRIPTION=${DUSTMOD_GIT_STATUS_LONG_DESCRIPTION:="true
 # show the 'username@hostname' always or only when on remote machines
 DUSTMOD_USER_HOST_ALWAYS="${DUSTMOD_USER_HOST_ALWAYS:=false}"
 # show python env information in prompt or not
-HUNTER_PYTHONN_ENV_PROMPT_ENABLED=${HUNTER_PYTHONN_ENV_PROMPT_ENABLED:="true"}
+HUNTER_PYTHON_ENV_PROMPT_ENABLED=${HUNTER_PYTHON_ENV_PROMPT_ENABLED:="true"}
 
 # requires git.zsh lib
 ZSH_THEME_GIT_PROMPT_PREFIX="(git:%F{green}"
@@ -172,7 +172,7 @@ function conda_prompt_info {
 
 function python_env_prompt_info {
 
-    if [[ "$HUNTER_PYTHONN_ENV_PROMPT_ENABLED" == "true" ]]; then
+    if [[ "$HUNTER_PYTHON_ENV_PROMPT_ENABLED" == "true" ]]; then
 
         if [ -n "$VIRTUAL_ENV" ] && [ -n "$CONDA_DEFAULT_ENV" ]; then
             echo "%{$fg[red]%}(venv and conda activated!)%{$reset_color%}"
